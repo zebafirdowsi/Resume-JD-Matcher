@@ -1,0 +1,29 @@
+Job Overview
+
+We are seeking a Junior AI Analyst to join our dynamic team at Huemn's Hyderabad office on a full-time basis. The ideal candidate will have 1 to 3 years of experience and a strong background in developing and applying machine learning models. This role requires a combination of technical proficiency and an understanding of photography industry needs to help us continue to innovate our products and services.
+
+Qualifications And Skills
+
+Proficiency in Python is critical for developing and implementing machine learning models (Mandatory skill).
+Strong understanding of various machine learning algorithms, necessary for enhancing our AI capabilities (Mandatory skill).
+Familiarity with Large Language Models (LLM) for natural language processing applications (Mandatory skill).
+Experience with TensorFlow to build and train machine learning models that solve complex tasks.
+Knowledge of PyTorch for deep learning projects that require flexibility and computational efficiency.
+Skilled in Natural Language Processing tools and techniques to improve user interaction with our platform.
+Understanding of RAG techniques to help refine recommendation systems for client galleries.
+Ability to work collaboratively across teams, understanding team management tools essential for project success.
+
+Roles And Responsibilities
+
+Develop and maintain machine learning models that enhance the intelligence and efficiency of our studio management tool.
+Collaborate with cross-functional teams to integrate AI solutions that meet photography industry standards.
+Analyze data trends to inform future AI projects and drive innovation within the team.
+Participate in code reviews, sharing knowledge and best practices to improve software quality.
+Conduct experiments to validate the effectiveness of AI models and iterate based on feedback and results.
+Prepare comprehensive documentation to support the understanding and maintenance of AI algorithms.
+Work closely with frontend and backend developers to ensure seamless integration of AI components.
+Stay updated with the latest developments in AI and machine learning to continually enhance our offerings.
+
+
+Desired Skills and Experience
+Python, TensorFlow, PyTorch, Natural Language Processing, Machine Learning Algorithms, Large Language Models (LLM), RAG

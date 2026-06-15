@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume JD Matcher</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #2d3a8c;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    /* MODE TABS */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .tab-btn {
+      padding: 10px 28px;
+      border: 2px solid #2d3a8c;
+      border-radius: 30px;
+      background: white;
+      color: #2d3a8c;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: #2d3a8c;
+      color: white;
+    }
+
+    /* CARD */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+
+    h2 {
+      font-size: 1.2rem;
+      color: #2d3a8c;
+      margin-bottom: 6px;
+    }
+
+    .mode-desc {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px dashed #c0c8f0;
+      border-radius: 10px;
+      background: #f7f9ff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    input[type="file"]:hover {
+      border-color: #2d3a8c;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: #2d3a8c;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover { background: #1e2a6e; }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* LOADER */
+    .loader {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      color: #2d3a8c;
+      font-size: 0.95rem;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 4px solid #e0e4ff;
+      border-top-color: #2d3a8c;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESULTS */
+    #results { margin-top: 30px; width: 100%; max-width: 600px; }
+
+    .result-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      border-left: 5px solid #2d3a8c;
+    }
+
+    .result-card h3 {
+      font-size: 1rem;
+      color: #2d3a8c;
+      margin-bottom: 10px;
+    }
+
+    .score-bar-bg {
+      background: #e8ecff;
+      border-radius: 20px;
+      height: 10px;
+      margin: 6px 0 12px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #2d3a8c, #5b6fd4);
+      transition: width 1s ease;
+    }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+    .tag {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .tag.green { background: #e6f9f0; color: #1a7a4a; }
+    .tag.red   { background: #fde8e8; color: #c0392b; }
+
+    .rec-list {
+      margin-top: 8px;
+      padding-left: 18px;
+      font-size: 0.85rem;
+      color: #444;
+    }
+
+    .rec-list li { margin-bottom: 4px; }
+
+    .error-box {
+      background: #fde8e8;
+      color: #c0392b;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🤖 Resume JD Matcher</h1>
+  <p class="subtitle">AI-powered matching using CrewAI agents</p>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchMode('hr')">🏢 HR Mode</button>
+    <button class="tab-btn" onclick="switchMode('student')">🎓 Student Mode</button>
+    <button class="tab-btn" onclick="switchMode('gap')">🔍 Gap Analysis</button>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- HR MODE -->
+    <div class="mode-panel active" id="panel-hr">
+      <h2>🏢 HR Mode</h2>
+      <p class="mode-desc">Upload 1 JD + multiple resumes → Find best candidate</p>
+      <div class="field">
+        <label>📄 Job Description (PDF, DOC, DOCX, TXT)</label>
+        <input type="file" id="hr-jd" accept=".pdf,.doc,.docx,.txt" />
+      </div>
+      <div class="field">
+        <label>📋 Resumes (PDF, DOC, DOCX, TXT, multiple select)</label>
+        <input type="file" id="hr-resumes" accept=".pdf,.doc,.docx,.txt" multiple />
+      </div>
+      <button class="submit-btn" onclick="submitForm('hr')">▶ Find Best Candidate</button>
+    </div>
+
+    <!-- STUDENT MODE -->
+    <div class="mode-panel" id="panel-student">
+      <h2>🎓 Student Mode</h2>
+      <p class="mode-desc">Upload your resume + multiple JDs → Find best job for you</p>
+      <div class="field">
+        <label>📄 Your Resume (PDF, DOC, DOCX, TXT)</label>
+        <input type="file" id="student-resume" accept=".pdf,.doc,.docx,.txt" />
+      </div>
+      <div class="field">
+        <label>📋 Job Descriptions (PDF, DOC, DOCX, TXT, multiple select)</label>
+        <input type="file" id="student-jds" accept=".pdf,.doc,.docx,.txt" multiple />
+      </div>
+      <button class="submit-btn" onclick="submitForm('student')">▶ Find Best Job</button>
+    </div>
+
+    <!-- GAP MODE -->
+    <div class="mode-panel" id="panel-gap">
+      <h2>🔍 Gap Analysis Mode</h2>
+      <p class="mode-desc">Upload 1 resume + 1 JD → See exact skill gaps</p>
+      <div class="field">
+        <label>📄 Your Resume (PDF, DOC, DOCX, TXT)</label>
+        <input type="file" id="gap-resume" accept=".pdf,.doc,.docx,.txt" />
+      </div>
+      <div class="field">
+        <label>📄 Job Description (PDF, DOC, DOCX, TXT)</label>
+        <input type="file" id="gap-jd" accept=".pdf,.doc,.docx,.txt" />
+      </div>
+      <button class="submit-btn" onclick="submitForm('gap')">▶ Analyse Gaps</button>
+    </div>
+
+    <!-- LOADER -->
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      Agents kaam kar rahe hain... thoda wait karo ☕
+    </div>
+
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results"></div>
+
+<script>
+  function switchMode(mode) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', ['hr','student','gap'][i] === mode);
+    });
+    document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + mode).classList.add('active');
+    document.getElementById('results').innerHTML = '';
+  }
+
+  async function submitForm(mode) {
+    const fd = new FormData();
+    fd.append('mode', mode);
+
+    if (mode === 'hr') {
+      const jd = document.getElementById('hr-jd').files[0];
+      const resumes = document.getElementById('hr-resumes').files;
+      if (!jd || resumes.length === 0) return alert('JD aur resumes dono upload karo!');
+      fd.append('jd', jd);
+      [...resumes].forEach(f => fd.append('resumes', f));
+    }
+    else if (mode === 'student') {
+      const resume = document.getElementById('student-resume').files[0];
+      const jds = document.getElementById('student-jds').files;
+      if (!resume || jds.length === 0) return alert('Resume aur JDs dono upload karo!');
+      fd.append('resume', resume);
+      [...jds].forEach(f => fd.append('jds', f));
+    }
+    else if (mode === 'gap') {
+      const resume = document.getElementById('gap-resume').files[0];
+      const jd = document.getElementById('gap-jd').files[0];
+      if (!resume || !jd) return alert('Resume aur JD dono upload karo!');
+      fd.append('resume', resume);
+      fd.append('jd', jd);
+    }
+
+    // Show loader
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('results').innerHTML = '';
+    document.querySelectorAll('.submit-btn').forEach(b => b.disabled = true);
+
+    try {
+      const res = await fetch('/process', { method: 'POST', body: fd });
+      const data = await res.json();
+      renderResults(mode, data);
+    } catch(e) {
+      document.getElementById('results').innerHTML =
+        `<div class="error-box">❌ Server error: ${e.message}</div>`;
+    } finally {
+      document.getElementById('loader').style.display = 'none';
+      document.querySelectorAll('.submit-btn').forEach(b => b.disabled = false);
+    }
+  }
+
+  function renderResults(mode, data) {
+    const container = document.getElementById('results');
+    if (data.error) {
+      container.innerHTML = `<div class="error-box">❌ ${data.error}</div>`;
+      return;
+    }
+
+    let html = '';
+
+    if (mode === 'hr' || mode === 'student') {
+      const items = data.results || [];
+      items.forEach((item, idx) => {
+        const score = item.match_score || 0;
+        const name = item.candidate_name || item.job_title || `Result ${idx+1}`;
+        const strengths = item.strengths || item.matched_skills || [];
+        const gaps = item.gaps || item.missing_skills || [];
+
+        html += `
+          <div class="result-card">
+            <h3>${idx === 0 ? '🏆' : `#${idx+1}`} ${name}</h3>
+            <div style="font-size:0.85rem;color:#666;">Match Score: <strong>${score}/100</strong></div>
+            <div class="score-bar-bg">
+              <div class="score-bar-fill" style="width:${score}%"></div>
+            </div>
+            ${strengths.length ? `<div style="font-size:0.82rem;color:#444;margin-bottom:4px;">✅ Strengths</div>
+            <div class="tag-list">${strengths.map(s=>`<span class="tag green">${s}</span>`).join('')}</div>` : ''}
+            ${gaps.length ? `<div style="font-size:0.82rem;color:#444;margin:8px 0 4px;">❌ Gaps</div>
+            <div class="tag-list">${gaps.map(g=>`<span class="tag red">${g}</span>`).join('')}</div>` : ''}
+          </div>`;
+      });
+    }
+
+    else if (mode === 'gap') {
+      const item = data.result || {};
+      const score = item.match_score || 0;
+      const matched = item.matched_skills || [];
+      const missing = item.missing_skills || [];
+      const recs = item.recommendations || [];
+
+      html = `
+        <div class="result-card">
+          <h3>🔍 Gap Analysis Result</h3>
+          <div style="font-size:0.85rem;color:#666;">Match Score: <strong>${score}/100</strong></div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:${score}%"></div>
+          </div>
+          ${matched.length ? `<div style="font-size:0.82rem;color:#444;margin-bottom:4px;">✅ Matched Skills</div>
+          <div class="tag-list">${matched.map(s=>`<span class="tag green">${s}</span>`).join('')}</div>` : ''}
+          ${missing.length ? `<div style="font-size:0.82rem;color:#444;margin:8px 0 4px;">❌ Missing Skills</div>
+          <div class="tag-list">${missing.map(g=>`<span class="tag red">${g}</span>`).join('')}</div>` : ''}
+          ${recs.length ? `<div style="font-size:0.82rem;color:#444;margin:10px 0 4px;">💡 Recommendations</div>
+          <ul class="rec-list">${recs.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
+        </div>`;
+    }
+
+    container.innerHTML = html || '<div class="error-box">⚠️ Koi result nahi aaya.</div>';
+  }
+</script>
+</body>
+</html>
